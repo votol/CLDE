@@ -7,7 +7,7 @@ std::list<CLmanagerBase::DeviceData> CLmanagerBase::getAllDevices(const cl_devic
     std::list<DeviceData> result;
     cl_uint number_of_platforms;
     cl_uint number_of_devices;
-    cl_int err;
+    cl_int err = 0;
     std::vector<cl_device_id> devices;
     clGetPlatformIDs(0, nullptr, &number_of_platforms);
 
@@ -32,6 +32,8 @@ std::list<CLmanagerBase::DeviceData> CLmanagerBase::getAllDevices(const cl_devic
 
 CLmanagerBase::~CLmanagerBase()
 {
+    if(m_queue)
+        clReleaseCommandQueue(*m_queue);
     if(m_context)
         clReleaseContext(*m_context);
 }
@@ -56,7 +58,7 @@ const cl_context& CLmanagerBase::context()
 {
     if(!m_context)
     {
-        cl_int err;
+        cl_int err = 0;
         if(!m_device_id)
             device();
         cl_context_properties properties[] = {CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>(m_device_id->platform), 0};
@@ -65,4 +67,18 @@ const cl_context& CLmanagerBase::context()
             throw std::runtime_error("OpenCL: unable to create context");
     }
     return *m_context;
+}
+
+const cl_command_queue& CLmanagerBase::command_queue()
+{
+    if(!m_queue)
+    {
+        cl_int err = 0;
+        if(!m_context)
+            context();
+        m_queue = clCreateCommandQueueWithProperties(*m_context, m_device_id->device, nullptr, &err);
+        if(err < 0 )
+            throw std::runtime_error("OpenCL: unable to create command queue");
+    }
+    return *m_queue;
 }

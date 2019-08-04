@@ -47,6 +47,9 @@ CLmanager::CLmanager(YAML::Node&& config)
     m_context = clCreateContext(properties, 1, & (device()), nullptr, nullptr, &err);
     if(err < 0 )
         throw std::runtime_error("OpenCL: unable to create context");
+    m_queue = clCreateCommandQueueWithProperties(*m_context, m_device_id->device, nullptr, &err);
+    if(err < 0 )
+        throw std::runtime_error("OpenCL: unable to create command queue");
 }
 
 const cl_device_id& CLmanager::device()
@@ -57,5 +60,10 @@ const cl_device_id& CLmanager::device()
 const cl_context& CLmanager::context()
 {
     return *m_context;
+}
+
+const cl_command_queue& CLmanager::command_queue()
+{
+    return *m_queue;
 }
 

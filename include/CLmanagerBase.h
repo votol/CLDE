@@ -15,6 +15,7 @@ protected:
     };
     std::optional<DeviceData> m_device_id = std::nullopt;
     std::optional<cl_context> m_context = std::nullopt;
+    std::optional<cl_command_queue> m_queue = std::nullopt;
     std::list<DeviceData> getAllDevices(const cl_device_type&);
 
 public:
@@ -22,4 +23,5 @@ public:
     virtual ~CLmanagerBase() override;
     virtual const cl_device_id& device() override;
     virtual const cl_context& context() override;
+    virtual const cl_command_queue& command_queue() override;
 };
