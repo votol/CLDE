@@ -2,6 +2,7 @@
 #include "CLmanagerBase.h"
 #include "yaml-cpp/yaml.h"
 
+namespace clde{
 class CLmanager: public CLmanagerBase
 {
 public:
@@ -10,4 +11,5 @@ public:
     virtual const cl_device_id& device() override;
     virtual const cl_context& context() override;
     virtual const cl_command_queue& command_queue() override;
+};
 };

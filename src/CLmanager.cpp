@@ -1,6 +1,8 @@
 #include "CLmanager.h"
 #include <string>
 
+using namespace clde;
+
 CLmanager::CLmanager(YAML::Node&& config)
 {
     cl_device_type device_type;

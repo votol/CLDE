@@ -4,6 +4,7 @@
 #include "ICLmanager.h"
 
 
+namespace clde{
 class CLmanagerBase: public ICLmanager
 {
 protected:
@@ -24,4 +25,5 @@ public:
     virtual const cl_device_id& device() override;
     virtual const cl_context& context() override;
     virtual const cl_command_queue& command_queue() override;
+};
 };

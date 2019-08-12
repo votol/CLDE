@@ -2,6 +2,8 @@
 #include <vector>
 #include <exception>
 
+using namespace clde;
+
 std::list<CLmanagerBase::DeviceData> CLmanagerBase::getAllDevices(const cl_device_type& type)
 {
     std::list<DeviceData> result;
