@@ -5,8 +5,18 @@ get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 
 set (SOURCES CLmanagerBase.cpp
              CLmanager.cpp
-             CLBLAS.cpp)
+             CLBLAS.cpp
+             DERunge4.cpp)
 
+set (HEADERS ../include/CLBLAS.h
+             ../include/CLDataStorage.h
+             ../include/CLmanager.h
+             ../include/CLmanagerBase.h
+             ../include/ICLmanager.h
+             ../include/IDEOperator.h
+             ../include/IDEOutput.h
+             ../include/DERunge4.h
+             )
 set (KERNELS kernels/Daxpy.cl)
 
 foreach(kernel ${KERNELS})
@@ -26,6 +36,7 @@ include_directories (~/include)
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES}
+                                   ${HEADERS}
                                    ${KERNEL_HEADERS})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 target_link_libraries(${PROJECT_NAME} OpenCL::OpenCL)

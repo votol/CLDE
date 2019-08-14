@@ -1,6 +1,8 @@
 #include "CLmanagerBase.h"
 #include <vector>
 #include <exception>
+#include "IDEOperator.h"
+#include "IDEOutput.h"
 
 using namespace clde;
 
