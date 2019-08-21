@@ -6,7 +6,8 @@ get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 set (SOURCES CLmanagerBase.cpp
              CLmanager.cpp
              CLBLAS.cpp
-             DERunge4.cpp)
+             DERunge4.cpp
+             PolynomialOperator.cpp)
 
 set (HEADERS ../include/CLBLAS.h
              ../include/CLDataStorage.h
@@ -16,6 +17,7 @@ set (HEADERS ../include/CLBLAS.h
              ../include/IDEOperator.h
              ../include/IDEOutput.h
              ../include/DERunge4.h
+             ../include/PolynomialOperator.h
              )
 set (KERNELS kernels/Daxpy.cl)
 

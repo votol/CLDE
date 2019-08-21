@@ -114,6 +114,7 @@ public:
             m_data.reset();
             m_size = 0;
         }
+        return *this;
     }
 
     const cl_mem& data() const
