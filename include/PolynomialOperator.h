@@ -22,22 +22,35 @@ private:
     class DataAligner
     {
     private:
-        struct Comparator
+        struct Key
         {
-            bool operator() (const std::list<unsigned int>& lhs, const std::list<unsigned int>& rhs);
+            bool operator()(const std::list<unsigned int>&, const std::list<unsigned int>&) const;
+        };
+        struct KeyNoise
+        {
+            bool operator()(const std::pair<std::list<unsigned int>, unsigned int>&,
+                            const std::pair<std::list<unsigned int>, unsigned int>&) const;
         };
 
+        std::vector<std::map<std::list<unsigned int>, double, Key>> m_elements;
+        std::vector<std::map<std::pair<std::list<unsigned int>, unsigned int>
+                        , double, KeyNoise>> m_elements_noise;
 
+        bool m_aligned;
+        size_t m_size;
+        unsigned int m_num;
+        unsigned int m_noise_num;
+
+        void print(void);
     public:
-        DataAligner(const size_t& dim);
+        DataAligner(const size_t& dim, const unsigned int& num);
         void add(const Monomial&);
-        const size_t& size() const;
-
+        void align(void);
     };
     size_t m_size;
     std::shared_ptr<ICLmanager> m_context;
 
-    void buildKernels(const DataAligner& in);
+    void buildKernels(DataAligner& in);
 public:
     template<typename _InputIterator,
          typename = std::_RequireInputIter<_InputIterator>>
@@ -59,9 +72,12 @@ public:
 
     template<typename _InputIterator,
          typename = std::_RequireInputIter<_InputIterator>>
-    PolynomialOperator(_InputIterator begin,  _InputIterator end, const unsigned int& )
+    PolynomialOperator(_InputIterator begin,  _InputIterator end,
+                       const unsigned int& num, const std::shared_ptr<ICLmanager>& context ):m_context(context)
     {
-        DataAligner aligner(calculateDimension(begin,end));
+        size_t dim = calculateDimension(begin,end);
+        m_size = dim * num + 1;
+        DataAligner aligner(dim, num);
         for(auto it = begin; it != end; ++it)
         {
             aligner.add(*it);
