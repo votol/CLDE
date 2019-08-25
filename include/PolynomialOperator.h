@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <optional>
+#include <complex>
 
 namespace clde
 {
@@ -12,8 +13,19 @@ struct Monomial
     unsigned int outInd = 0;
     double coe = 0.0;
     std::list<unsigned int> inInds;
-    std::optional<unsigned int> noise;
+    std::optional<unsigned int> tFunc;
 };
+
+struct MonomialC
+{
+    unsigned int outInd = 0;
+    std::complex<double> coe;
+    std::list<unsigned int> inInds;
+    std::list<unsigned int> inIndsC;
+    std::optional<unsigned int> tFunc;
+};
+
+std::list<Monomial> convertMonomials(const std::list<MonomialC>&);
 
 
 class PolynomialOperator: public IDEOperator
@@ -36,19 +48,26 @@ private:
         std::vector<std::map<std::pair<std::list<unsigned int>, unsigned int>
                         , double, KeyNoise>> m_elements_noise;
 
-        bool m_aligned;
         size_t m_size;
         unsigned int m_num;
         unsigned int m_noise_num;
+        std::optional<std::list<unsigned int> > m_dims;
 
         void print(void);
     public:
         DataAligner(const size_t& dim, const unsigned int& num);
         void add(const Monomial&);
-        void align(void);
+        std::list<unsigned int> getDims(void);
+        std::vector<double> getCoes(void);
+        std::vector<unsigned int> getIndexes(void);
     };
     size_t m_size;
+    unsigned int m_num;
+    unsigned int align;
     std::shared_ptr<ICLmanager> m_context;
+    cl_kernel m_kernel_oper;
+    CLDataStorage<double> m_devie_coes;
+    CLDataStorage<unsigned int> m_device_inds;
 
     void buildKernels(DataAligner& in);
 public:
@@ -73,7 +92,8 @@ public:
     template<typename _InputIterator,
          typename = std::_RequireInputIter<_InputIterator>>
     PolynomialOperator(_InputIterator begin,  _InputIterator end,
-                       const unsigned int& num, const std::shared_ptr<ICLmanager>& context ):m_context(context)
+                       const unsigned int& num, const std::shared_ptr<ICLmanager>& context ):m_num(num),m_context(context),
+                       m_devie_coes(context), m_device_inds(context)
     {
         size_t dim = calculateDimension(begin,end);
         m_size = dim * num + 1;
@@ -85,9 +105,6 @@ public:
         buildKernels(aligner);
     }
     const size_t & dimension() override{return m_size;}
-    void apply(const CLDataStorage<double> &in, CLDataStorage<double> &out, const std::vector<double> &) override
-    {
-        out = in;
-    }
+    void apply(const CLDataStorage<double> &in, CLDataStorage<double> &out, const std::vector<double> &) override;
 };
 };

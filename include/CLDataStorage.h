@@ -38,6 +38,7 @@ public:
         if( err < 0)
             throw std::runtime_error("OpenCL: unable to copy memory buffer");
         clWaitForEvents(1, &copy_event);
+        clReleaseEvent(copy_event);
     }
 
     CLDataStorage(const CLDataStorage& in):m_context(in.m_context), m_size(in.m_size)
@@ -52,6 +53,7 @@ public:
             if( err < 0)
                 throw std::runtime_error("OpenCL: unable to copy memory buffer");
             clWaitForEvents(1, &copy_event);
+            clReleaseEvent(copy_event);
         }
     }
 
@@ -86,6 +88,7 @@ public:
         if( err < 0)
             throw std::runtime_error("OpenCL: unable to copy memory buffer");
         clWaitForEvents(1, &copy_event);
+        clReleaseEvent(copy_event);
         return *this;
     }
     CLDataStorage& operator=(const CLDataStorage& in)
@@ -107,6 +110,7 @@ public:
             if( err < 0)
                 throw std::runtime_error("OpenCL: unable to copy memory buffer");
             clWaitForEvents(1, &copy_event);
+            clReleaseEvent(copy_event);
 
         }
         else if(m_data){

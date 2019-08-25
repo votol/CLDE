@@ -15,5 +15,6 @@ public:
     ~CLBLAS();
     //doing y = alpha*x + y for double variables
     void Daxpy(const CLDataStorage<double>& y, const CLDataStorage<double>& x, const double& alpha);
+    static cl_kernel createKernel(const char* source,  const std::string& func_name,const std::shared_ptr<ICLmanager>& context);
 };
 }

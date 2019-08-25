@@ -5,7 +5,7 @@
 #include "kernels/Daxpy.h"
 using namespace clde;
 
-cl_kernel createKernel(const char* source,  const std::string& func_name,const std::shared_ptr<ICLmanager>& context)
+cl_kernel CLBLAS::createKernel(const char* source,  const std::string& func_name,const std::shared_ptr<ICLmanager>& context)
 {
     cl_int err = 0;
 
@@ -73,4 +73,5 @@ void CLBLAS::Daxpy(const CLDataStorage<double>& y, const CLDataStorage<double>& 
              nullptr, 0, nullptr, &run_event);
 
     clWaitForEvents(1, &run_event);
+    clReleaseEvent(run_event);
 }
