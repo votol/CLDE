@@ -7,7 +7,8 @@ set (SOURCES CLmanagerBase.cpp
              CLmanager.cpp
              CLBLAS.cpp
              DERunge4.cpp
-             PolynomialOperator.cpp)
+             PolynomialOperator.cpp
+             FakeFuncCalculator.cpp)
 
 set (HEADERS ../include/CLBLAS.h
              ../include/CLDataStorage.h
@@ -18,6 +19,8 @@ set (HEADERS ../include/CLBLAS.h
              ../include/IDEOutput.h
              ../include/DERunge4.h
              ../include/PolynomialOperator.h
+             ../include/IFuncCalculator.h
+             ../include/FakeFuncCalculator.h
              )
 set (KERNELS kernels/Daxpy.cl)
 

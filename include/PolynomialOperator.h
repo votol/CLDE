@@ -1,5 +1,6 @@
 #pragma once
 #include "IDEOperator.h"
+#include "FakeFuncCalculator.h"
 #include <list>
 #include <vector>
 #include <map>
@@ -44,30 +45,42 @@ private:
                             const std::pair<std::list<unsigned int>, unsigned int>&) const;
         };
 
-        std::vector<std::map<std::list<unsigned int>, double, Key>> m_elements;
-        std::vector<std::map<std::pair<std::list<unsigned int>, unsigned int>
-                        , double, KeyNoise>> m_elements_noise;
+        struct OutElementData
+        {
+            std::map<std::list<unsigned int>, double, Key> constElements;
+            std::map<std::pair<std::list<unsigned int>, unsigned int>
+                            , double, KeyNoise> timeElements;
+        };
+
+        std::vector<OutElementData> m_elements;
 
         size_t m_size;
         unsigned int m_num;
-        unsigned int m_noise_num;
-        std::optional<std::list<unsigned int> > m_dims;
+        unsigned int m_time_num;
+        std::optional<std::list<unsigned int> > m_dims_const;
+        std::optional<std::list<unsigned int> > m_dims_time;
 
-        void print(void);
     public:
         DataAligner(const size_t& dim, const unsigned int& num);
         void add(const Monomial&);
-        std::list<unsigned int> getDims(void);
+        std::list<unsigned int> getConstDims(void);
+        std::list<unsigned int> getTimeDims(void);
         std::vector<double> getCoes(void);
         std::vector<unsigned int> getIndexes(void);
+        std::vector<unsigned int> getTimeIndexes(void);
+        unsigned int getTimeFuncNumber(void);
     };
     size_t m_size;
     unsigned int m_num;
-    unsigned int align;
+    unsigned int m_time_num;
+    bool m_is_constant = true;
     std::shared_ptr<ICLmanager> m_context;
     cl_kernel m_kernel_oper;
     CLDataStorage<double> m_devie_coes;
     CLDataStorage<unsigned int> m_device_inds;
+    CLDataStorage<unsigned int> m_device_time_inds;
+    std::shared_ptr<IFuncCalculator> m_time_calc;
+
 
     void buildKernels(DataAligner& in);
 public:
@@ -93,7 +106,7 @@ public:
          typename = std::_RequireInputIter<_InputIterator>>
     PolynomialOperator(_InputIterator begin,  _InputIterator end,
                        const unsigned int& num, const std::shared_ptr<ICLmanager>& context ):m_num(num),m_context(context),
-                       m_devie_coes(context), m_device_inds(context)
+                       m_devie_coes(context), m_device_inds(context), m_device_time_inds(context)
     {
         size_t dim = calculateDimension(begin,end);
         m_size = dim * num + 1;
@@ -106,5 +119,6 @@ public:
     }
     const size_t & dimension() override{return m_size;}
     void apply(const CLDataStorage<double> &in, CLDataStorage<double> &out, const std::vector<double> &) override;
+    void setTimeFuncCalculator(const std::shared_ptr<IFuncCalculator>& calc);
 };
 };
