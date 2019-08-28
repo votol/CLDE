@@ -8,7 +8,8 @@ set (SOURCES CLmanagerBase.cpp
              CLBLAS.cpp
              DERunge4.cpp
              PolynomialOperator.cpp
-             FakeFuncCalculator.cpp)
+             FakeFuncCalculator.cpp
+             WienerFuncCalculator.cpp)
 
 set (HEADERS ../include/CLBLAS.h
              ../include/CLDataStorage.h
@@ -21,8 +22,10 @@ set (HEADERS ../include/CLBLAS.h
              ../include/PolynomialOperator.h
              ../include/IFuncCalculator.h
              ../include/FakeFuncCalculator.h
+             ../include/WienerFuncCalculator.h
              )
-set (KERNELS kernels/Daxpy.cl)
+set (KERNELS kernels/Daxpy.cl
+             kernels/WienerCalc.cl)
 
 foreach(kernel ${KERNELS})
     string(REPLACE ".cl" ".h" kernel_header ${kernel})

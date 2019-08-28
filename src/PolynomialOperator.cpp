@@ -615,6 +615,7 @@ void PolynomialOperator::buildKernels(DataAligner &in)
         m_device_time_inds = in.getTimeIndexes();
         m_time_calc = std::shared_ptr<IFuncCalculator>(new FakeFuncCalculator(m_context));
         m_time_calc->init(in.getTimeFuncNumber());
+        m_time_num = in.getTimeFuncNumber();
     }
 
 
@@ -687,6 +688,11 @@ void PolynomialOperator::buildKernels(DataAligner &in)
     }
 }
 
+PolynomialOperator::~PolynomialOperator()
+{
+    clReleaseKernel(m_kernel_oper);
+}
+
 void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<double> &out, const std::vector<double> &param)
 {
     if(in.size() != out.size())
@@ -694,7 +700,7 @@ void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<do
 
     size_t num = in.size();
     cl_int err = 0;
-    static cl_event run_event;
+    cl_event run_event;
 
     err = clSetKernelArg(m_kernel_oper, 0, sizeof(cl_mem), &out.data());
     err |= clSetKernelArg(m_kernel_oper, 1, sizeof(cl_mem), &in.data());
@@ -716,10 +722,12 @@ void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<do
 
 void PolynomialOperator::setTimeFuncCalculator(const std::shared_ptr<IFuncCalculator> &calc)
 {
+    if(m_is_constant)
+        return;
     cl_int err = 0;
     m_time_calc = calc;
     m_time_calc->init(m_time_num);
-    err = clSetKernelArg(m_kernel_oper, 4, sizeof(cl_mem), &m_time_calc->data());
+    err = clSetKernelArg(m_kernel_oper, 4, sizeof(cl_mem), &m_time_calc->data().data());
     if(err < 0) {
         throw std::runtime_error("OpenCL: couldn't set an argument for the polynomial operator kernel");
     }

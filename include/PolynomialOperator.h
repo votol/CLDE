@@ -117,6 +117,7 @@ public:
         }
         buildKernels(aligner);
     }
+    ~PolynomialOperator() override;
     const size_t & dimension() override{return m_size;}
     void apply(const CLDataStorage<double> &in, CLDataStorage<double> &out, const std::vector<double> &) override;
     void setTimeFuncCalculator(const std::shared_ptr<IFuncCalculator>& calc);
