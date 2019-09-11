@@ -7,12 +7,13 @@ using namespace clde;
 
 DERunge4::DERunge4(const std::shared_ptr<ICLmanager>& contex, IDEOperator* op):
     m_dt(1.0), m_Nsteps(1), m_Noutputs(1),m_blas(contex),
-    m_operator(op), m_init(op->dimension(), contex),
-    m_vec1(op->dimension(), contex),m_vec2(op->dimension(), contex),
-    m_vec3(op->dimension(), contex),m_vec4(op->dimension(), contex),
+    m_operator(op), m_init(op->dimension().in_dim, contex),
+    m_vec1(op->dimension().in_dim, contex),m_vec2(op->dimension().in_dim, contex),
+    m_vec3(op->dimension().in_dim, contex),m_vec4(op->dimension().in_dim, contex),
     m_parameters(1)
 {
-
+    if(op->dimension().in_dim != op->dimension().in_dim)
+        throw std::runtime_error("DERunge4 : input operator should be square");
 }
 
 void DERunge4::SetTimeStep(const double & in)
@@ -40,7 +41,7 @@ void DERunge4::SetParameters(const std::vector<double> & in)
 
 void DERunge4::SetInitState(const std::vector<double> & in)
 {
-    if(in.size() != m_operator->dimension())
+    if(in.size() != m_operator->dimension().in_dim)
         throw std::invalid_argument("Dimension of input vector should agree with operator");
     m_init = in;
 }

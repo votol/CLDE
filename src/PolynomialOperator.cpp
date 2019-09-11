@@ -297,8 +297,8 @@ bool PolynomialOperator::DataAligner::KeyNoise::operator()(const std::pair<std::
     return lhs.second < rhs.second;
 }
 
-PolynomialOperator::DataAligner::DataAligner(const size_t& dim, const unsigned int& num):
-    m_elements(dim + 1), m_size(dim), m_num(num), m_time_num(0)
+PolynomialOperator::DataAligner::DataAligner(const OperatorDimension& dim, const unsigned int& num):
+    m_elements(dim.out_dim + 1), m_size(dim), m_num(num), m_time_num(0)
 {
 
 }
@@ -407,7 +407,7 @@ std::vector<double> PolynomialOperator::DataAligner::getCoes()
     if(!m_dims_time)
         getTimeDims();
 
-    std::vector<double> result((m_dims_const->size() + m_dims_time->size())* (1 + m_num*m_size));
+    std::vector<double> result((m_dims_const->size() + m_dims_time->size())* (1 + m_num * m_size.out_dim));
     auto resIt = result.begin();
     for(auto dimIt = m_dims_const->begin();dimIt != m_dims_const->end();++dimIt)
     {
@@ -470,7 +470,7 @@ std::vector<unsigned int> PolynomialOperator::DataAligner::getIndexes()
         one_out_size_time += *it;
     }
 
-    std::vector<unsigned int> result((one_out_size_const + one_out_size_time) * (1+ m_num*m_size));
+    std::vector<unsigned int> result((one_out_size_const + one_out_size_time) * (1+ m_num * m_size.out_dim));
     auto resIt = result.begin();
     for(unsigned int ind = 0; ind < one_out_size_const + one_out_size_time;++ind)
     {
@@ -487,7 +487,7 @@ std::vector<unsigned int> PolynomialOperator::DataAligner::getIndexes()
             {
                 for(auto indexIt = summandIt->first.begin(); indexIt != summandIt->first.end(); indexIt++)
                 {
-                    *resIt = *indexIt + ind * static_cast<unsigned int>(m_size);
+                    *resIt = *indexIt + ind * static_cast<unsigned int>(m_size.in_dim);
                     ++resIt;
                     index_added++;
                 }
@@ -504,7 +504,7 @@ std::vector<unsigned int> PolynomialOperator::DataAligner::getIndexes()
             {
                 for(auto indexIt = summandIt->first.first.begin(); indexIt != summandIt->first.first.end(); indexIt++)
                 {
-                    *resIt = *indexIt + ind * static_cast<unsigned int>(m_size);
+                    *resIt = *indexIt + ind * static_cast<unsigned int>(m_size.in_dim);
                     ++resIt;
                     index_added++;
                 }
@@ -524,7 +524,7 @@ std::vector<unsigned int> PolynomialOperator::DataAligner::getTimeIndexes()
 {
     if(!m_dims_time)
         getTimeDims();
-    std::vector<unsigned int> result(m_dims_time->size() * (1+ m_num*m_size));
+    std::vector<unsigned int> result(m_dims_time->size() * (1+ m_num * m_size.out_dim));
     auto resIt = result.begin();
     for(auto dimIt = m_dims_time->begin();dimIt != m_dims_time->end();++dimIt)
     {
@@ -695,8 +695,8 @@ PolynomialOperator::~PolynomialOperator()
 
 void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<double> &out, const std::vector<double> &param)
 {
-    if(in.size() != out.size())
-        throw std::runtime_error("Polynomial Operator: input vectors should have the same size");
+    if(in.size() != m_size.in_dim && out.size() != m_size.out_dim)
+        throw std::runtime_error("Polynomial Operator: vectors size does not agree with operator dimensions");
 
     size_t num = in.size();
     cl_int err = 0;

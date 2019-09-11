@@ -54,14 +54,14 @@ private:
 
         std::vector<OutElementData> m_elements;
 
-        size_t m_size;
+        OperatorDimension m_size;
         unsigned int m_num;
         unsigned int m_time_num;
         std::optional<std::list<unsigned int> > m_dims_const;
         std::optional<std::list<unsigned int> > m_dims_time;
 
     public:
-        DataAligner(const size_t& dim, const unsigned int& num);
+        DataAligner(const OperatorDimension& dim, const unsigned int& num);
         void add(const Monomial&);
         std::list<unsigned int> getConstDims(void);
         std::list<unsigned int> getTimeDims(void);
@@ -70,7 +70,7 @@ private:
         std::vector<unsigned int> getTimeIndexes(void);
         unsigned int getTimeFuncNumber(void);
     };
-    size_t m_size;
+    OperatorDimension m_size;
     unsigned int m_num;
     unsigned int m_time_num;
     bool m_is_constant = true;
@@ -86,17 +86,17 @@ private:
 public:
     template<typename _InputIterator,
          typename = std::_RequireInputIter<_InputIterator>>
-    static size_t calculateDimension(_InputIterator begin,  _InputIterator end)
+    static OperatorDimension calculateDimension(_InputIterator begin,  _InputIterator end)
     {
-        size_t result = 0;
+        OperatorDimension result;
         for(auto it = begin; it != end; ++it)
         {
-            if(it->outInd + 1 > result)
-                result = it->outInd + 1;
+            if(it->outInd + 1 > result.out_dim)
+                result.out_dim = it->outInd + 1;
             for(auto inIt = it->inInds.begin(); inIt != it->inInds.end(); ++inIt)
             {
-                if(*inIt + 1 > result)
-                    result = *inIt + 1;
+                if(*inIt + 1 > result.in_dim)
+                    result.in_dim = *inIt + 1;
             }
         }
         return result;
@@ -105,11 +105,24 @@ public:
     template<typename _InputIterator,
          typename = std::_RequireInputIter<_InputIterator>>
     PolynomialOperator(_InputIterator begin,  _InputIterator end,
-                       const unsigned int& num, const std::shared_ptr<ICLmanager>& context ):m_num(num),m_context(context),
+                       const unsigned int& num, const std::shared_ptr<ICLmanager>& context,
+                       const bool& square):m_num(num),m_context(context),
                        m_devie_coes(context), m_device_inds(context), m_device_time_inds(context)
     {
-        size_t dim = calculateDimension(begin,end);
-        m_size = dim * num + 1;
+        OperatorDimension dim = calculateDimension(begin,end);
+        if(square)
+        {
+            size_t size_tmp = (dim.in_dim > dim.out_dim)? dim.in_dim: dim.out_dim;
+            m_size.in_dim = size_tmp * num + 1;
+            m_size.out_dim = size_tmp * num + 1;
+            dim.in_dim = size_tmp;
+            dim.out_dim = size_tmp;
+        }
+        else
+        {
+            m_size.in_dim = dim.in_dim * num + 1;
+            m_size.out_dim = dim.out_dim * num + 1;
+        }
         DataAligner aligner(dim, num);
         for(auto it = begin; it != end; ++it)
         {
@@ -118,7 +131,7 @@ public:
         buildKernels(aligner);
     }
     ~PolynomialOperator() override;
-    const size_t & dimension() override{return m_size;}
+    const OperatorDimension & dimension() override{return m_size;}
     void apply(const CLDataStorage<double> &in, CLDataStorage<double> &out, const std::vector<double> &) override;
     void setTimeFuncCalculator(const std::shared_ptr<IFuncCalculator>& calc);
 };

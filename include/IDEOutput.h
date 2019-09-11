@@ -7,7 +7,7 @@ class IDEOutput
 {
 public:
     virtual ~IDEOutput() = default;
-    virtual void apply(const CLDataStorage<double>& in, const std::vector<double>&) = 0;
+    virtual void apply(const CLDataStorage<double>& , const std::vector<double>&) = 0;
 };
 
 };
