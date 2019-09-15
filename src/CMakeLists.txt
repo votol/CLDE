@@ -9,7 +9,8 @@ set (SOURCES CLmanagerBase.cpp
              DERunge4.cpp
              PolynomialOperator.cpp
              FakeFuncCalculator.cpp
-             WienerFuncCalculator.cpp)
+             WienerFuncCalculator.cpp
+             PolynomialOutput.cpp)
 
 set (HEADERS ../include/CLBLAS.h
              ../include/CLDataStorage.h
@@ -23,6 +24,7 @@ set (HEADERS ../include/CLBLAS.h
              ../include/IFuncCalculator.h
              ../include/FakeFuncCalculator.h
              ../include/WienerFuncCalculator.h
+             ../include/PolynomialOutput.h
              )
 set (KERNELS kernels/Daxpy.cl
              kernels/WienerCalc.cl)

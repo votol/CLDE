@@ -86,7 +86,7 @@ private:
 public:
     template<typename _InputIterator,
          typename = std::_RequireInputIter<_InputIterator>>
-    static OperatorDimension calculateDimension(_InputIterator begin,  _InputIterator end)
+    static OperatorDimension calculateDimension(_InputIterator begin,  _InputIterator end, const bool& square)
     {
         OperatorDimension result;
         for(auto it = begin; it != end; ++it)
@@ -99,30 +99,24 @@ public:
                     result.in_dim = *inIt + 1;
             }
         }
+        if(square)
+        {
+            size_t size_tmp = (result.in_dim > result.out_dim)? result.in_dim: result.out_dim;
+            result.in_dim = size_tmp;
+            result.out_dim = size_tmp;
+        }
         return result;
     }
 
     template<typename _InputIterator,
          typename = std::_RequireInputIter<_InputIterator>>
     PolynomialOperator(_InputIterator begin,  _InputIterator end,
-                       const unsigned int& num, const std::shared_ptr<ICLmanager>& context,
-                       const bool& square):m_num(num),m_context(context),
+                       const unsigned int& num, const OperatorDimension& dim,
+                       const std::shared_ptr<ICLmanager>& context):m_num(num),m_context(context),
                        m_devie_coes(context), m_device_inds(context), m_device_time_inds(context)
     {
-        OperatorDimension dim = calculateDimension(begin,end);
-        if(square)
-        {
-            size_t size_tmp = (dim.in_dim > dim.out_dim)? dim.in_dim: dim.out_dim;
-            m_size.in_dim = size_tmp * num + 1;
-            m_size.out_dim = size_tmp * num + 1;
-            dim.in_dim = size_tmp;
-            dim.out_dim = size_tmp;
-        }
-        else
-        {
-            m_size.in_dim = dim.in_dim * num + 1;
-            m_size.out_dim = dim.out_dim * num + 1;
-        }
+        m_size.in_dim = dim.in_dim * num + 1;
+        m_size.out_dim = dim.out_dim * num + 1;
         DataAligner aligner(dim, num);
         for(auto it = begin; it != end; ++it)
         {

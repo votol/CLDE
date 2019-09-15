@@ -576,7 +576,7 @@ void PolynomialOperator::buildKernels(DataAligner &in)
     std::vector<unsigned int> inInds(in.getIndexes());
     auto coesIt = coes.begin();
     auto inIndsIt = inInds.begin();
-    for(unsigned int ind = 0; ind<m_size;++ind)
+    for(unsigned int ind = 0; ind<m_size.out_dim;++ind)
     {
         for(auto it = dims_const.rbegin();it != dims_const.rend(); ++it)
         {
@@ -698,7 +698,7 @@ void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<do
     if(in.size() != m_size.in_dim && out.size() != m_size.out_dim)
         throw std::runtime_error("Polynomial Operator: vectors size does not agree with operator dimensions");
 
-    size_t num = in.size();
+    size_t num = out.size();
     cl_int err = 0;
     cl_event run_event;
 
@@ -716,7 +716,20 @@ void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<do
     err = clEnqueueNDRangeKernel(m_context->command_queue(), m_kernel_oper, 1, nullptr, &num,
              nullptr, 0, nullptr, &run_event);
 
+    if(err < 0) {
+        throw std::runtime_error("PolynomialOperator_run : OpenCL: problems with kernels");
+    }
     clWaitForEvents(1, &run_event);
+    /*cl_int status;
+    err = clGetEventInfo(run_event, CL_EVENT_COMMAND_EXECUTION_STATUS, sizeof(cl_int), &status, nullptr);
+    if(err < 0 )
+    {
+        throw std::runtime_error("PolynomialOperator_run : OpenCL: can't get status");
+    }
+    if(status < 0)
+    {
+        throw std::runtime_error("PolynomialOperator_run : OpenCL: kernel faild");
+    }*/
     clReleaseEvent(run_event);
 }
 

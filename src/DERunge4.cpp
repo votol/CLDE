@@ -12,7 +12,7 @@ DERunge4::DERunge4(const std::shared_ptr<ICLmanager>& contex, IDEOperator* op):
     m_vec3(op->dimension().in_dim, contex),m_vec4(op->dimension().in_dim, contex),
     m_parameters(1)
 {
-    if(op->dimension().in_dim != op->dimension().in_dim)
+    if(op->dimension().in_dim != op->dimension().out_dim)
         throw std::runtime_error("DERunge4 : input operator should be square");
 }
 
