@@ -1,6 +1,7 @@
 #pragma once
 #include "IDEOperator.h"
 #include "FakeFuncCalculator.h"
+#include "PolynomialUtils.h"
 #include <list>
 #include <vector>
 #include <map>
@@ -9,26 +10,6 @@
 
 namespace clde
 {
-struct Monomial
-{
-    unsigned int outInd = 0;
-    double coe = 0.0;
-    std::list<unsigned int> inInds;
-    std::optional<unsigned int> tFunc;
-};
-
-struct MonomialC
-{
-    unsigned int outInd = 0;
-    std::complex<double> coe;
-    std::list<unsigned int> inInds;
-    std::list<unsigned int> inIndsC;
-    std::optional<unsigned int> tFunc;
-};
-
-std::list<Monomial> convertMonomials(const std::list<MonomialC>&);
-
-
 class PolynomialOperator: public IDEOperator
 {
 private:
