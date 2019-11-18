@@ -223,16 +223,24 @@ std::vector<unsigned int> PolynomialOperator::DataAligner::getIndexes()
     {
         for(auto outIt = ++(m_elements.begin());outIt != m_elements.end();++outIt)
         {
+            auto control_indexs_number_it = m_dims_const->rbegin();
             unsigned int index_added = 0;
             for(auto summandIt = outIt->constElements.rbegin();summandIt != outIt->constElements.rend();++summandIt)
             {
+                unsigned int single_index_added = 0;
                 for(auto indexIt = summandIt->first.begin(); indexIt != summandIt->first.end(); indexIt++)
                 {
                     *resIt = *indexIt + ind * static_cast<unsigned int>(m_size.in_dim);
                     ++resIt;
-                    index_added++;
+                    ++single_index_added;
                 }
-
+                for(;single_index_added<*control_indexs_number_it;++single_index_added)
+                {
+                    *resIt = 0;
+                    ++resIt;
+                }
+                ++control_indexs_number_it;
+                index_added += single_index_added;
             }
             for(;index_added<one_out_size_const;++index_added)
             {
@@ -240,15 +248,24 @@ std::vector<unsigned int> PolynomialOperator::DataAligner::getIndexes()
                 ++resIt;
             }
 
+            control_indexs_number_it = m_dims_time->rbegin();
             index_added = 0;
             for(auto summandIt = outIt->timeElements.rbegin();summandIt != outIt->timeElements.rend();++summandIt)
             {
+                unsigned int single_index_added = 0;
                 for(auto indexIt = summandIt->first.first.begin(); indexIt != summandIt->first.first.end(); indexIt++)
                 {
                     *resIt = *indexIt + ind * static_cast<unsigned int>(m_size.in_dim);
                     ++resIt;
-                    index_added++;
+                    ++single_index_added;
                 }
+                for(;single_index_added<*control_indexs_number_it;++single_index_added)
+                {
+                    *resIt = 0;
+                    ++resIt;
+                }
+                ++control_indexs_number_it;
+                index_added += single_index_added;
 
             }
             for(;index_added<one_out_size_time;++index_added)
