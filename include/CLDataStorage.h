@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <optional>
+#include <stdexcept>
 
 namespace clde{
 template <class T>

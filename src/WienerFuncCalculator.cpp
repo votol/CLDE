@@ -3,6 +3,7 @@
 #include "CLBLAS.h"
 #include <string>
 #include <random>
+#include <stdexcept>
 
 using namespace clde;
 

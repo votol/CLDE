@@ -1,6 +1,6 @@
 #include <string>
 #include <string_view>
-#include <exception>
+#include <stdexcept>
 #include "CLBLAS.h"
 #include "kernels/Daxpy.h"
 using namespace clde;
