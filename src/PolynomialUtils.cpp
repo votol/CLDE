@@ -155,6 +155,63 @@ std::ostream& clde::operator<<(std::ostream& os, const Monomial& mo)
     return os;
 }
 
+std::ofstream& clde::operator<<(std::ofstream& os, const Polynomial& poly)
+{
+    unsigned int out_int;
+    double out_double;
+
+    //number of monomials
+    out_int = static_cast<unsigned int>(poly.size());
+    os.write(reinterpret_cast <char*>(&out_int), 4);
+    for(auto&& mon: poly)
+    {
+        out_double = mon.coe;
+        os.write(reinterpret_cast <char*>(&out_double), 8);
+        out_int = mon.outInd;
+        os.write(reinterpret_cast <char*>(&out_int), 4);
+
+        out_int = static_cast<unsigned int>(mon.inInds.size());
+        os.write(reinterpret_cast <char*>(&out_int), 4);
+
+        for(auto&& ind: mon.inInds)
+        {
+            out_int = ind;
+            os.write(reinterpret_cast <char*>(&out_int), 4);
+        }
+    }
+
+    return os;
+}
+
+std::ifstream& clde::operator>>(std::ifstream& is, Polynomial& poly)
+{
+    unsigned int mon_count;
+    unsigned int inds_count;
+    unsigned int ind_read;
+    double out_double;
+
+    //number of monomials
+    is.read(reinterpret_cast <char*>(&mon_count), 4);
+    for(unsigned int mon_ind = 0; mon_ind < mon_count; ++mon_ind)
+    {
+        poly.push_back(Monomial());
+        is.read(reinterpret_cast <char*>(&out_double), 8);
+        poly.back().coe = out_double;
+
+        is.read(reinterpret_cast <char*>(&ind_read), 4);
+        poly.back().outInd = ind_read;
+
+        is.read(reinterpret_cast <char*>(&inds_count), 4);
+        for(unsigned int ind = 0; ind < inds_count; ++ind)
+        {
+            is.read(reinterpret_cast <char*>(&ind_read), 4);
+            poly.back().inInds.push_back(ind_read);
+        }
+    }
+
+    return is;
+}
+
 Polynomial clde::convertMonomials(const PolynomialC& in)
 {
     std::set<MonomialAnc> monomials;

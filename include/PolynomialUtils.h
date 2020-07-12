@@ -3,6 +3,7 @@
 #include <optional>
 #include <complex>
 #include <vector>
+#include <fstream>
 
 namespace clde
 {
@@ -28,6 +29,8 @@ using PolynomialC = std::list<MonomialC>;
 
 
 std::ostream& operator<<(std::ostream& os, const Monomial& mo);
+std::ofstream& operator<<(std::ofstream& os, const Polynomial& poly);
+std::ifstream& operator>>(std::ifstream& os, Polynomial& poly);
 Polynomial convertMonomials(const PolynomialC&);
 Polynomial polynomialDerivative(const Polynomial&, const unsigned int& var);
 std::vector<Polynomial> polynomialGradient(const Polynomial&, const unsigned int& var_count);
