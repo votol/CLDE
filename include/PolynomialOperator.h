@@ -7,6 +7,7 @@
 #include <map>
 #include <optional>
 #include <complex>
+#include <iostream>
 
 namespace clde
 {
@@ -57,10 +58,13 @@ private:
     bool m_is_constant = true;
     std::shared_ptr<ICLmanager> m_context;
     cl_kernel m_kernel_oper;
+    size_t m_global_work_size;
+    size_t m_local_work_size;
     CLDataStorage<double> m_devie_coes;
     CLDataStorage<unsigned int> m_device_inds;
     CLDataStorage<unsigned int> m_device_time_inds;
     std::shared_ptr<IFuncCalculator> m_time_calc;
+
 
 
     void buildKernels(DataAligner& in);
@@ -104,6 +108,24 @@ public:
             aligner.add(*it);
         }
         buildKernels(aligner);
+
+        m_local_work_size = 0;
+        cl_int err = 0;
+        err = clGetKernelWorkGroupInfo(m_kernel_oper,
+                                       m_context->device(),
+                                       CL_KERNEL_WORK_GROUP_SIZE,
+                                       sizeof(size_t),
+                                       &m_local_work_size,
+                                       nullptr);
+
+        if(err < 0) {
+            throw std::runtime_error("PolynomialOperator_build : OpenCL: problems with kernels work group size");
+        }
+        m_local_work_size = std::min(m_local_work_size, static_cast<size_t>(64));
+        if(m_size.out_dim % m_local_work_size == 0)
+            m_global_work_size = m_size.out_dim;
+        else
+            m_global_work_size = (m_size.out_dim / m_local_work_size + 1) * m_local_work_size;
     }
     ~PolynomialOperator() override;
     const OperatorDimension & dimension() override{return m_size;}

@@ -387,6 +387,10 @@ void PolynomialOperator::buildKernels(DataAligner &in)
         kernel_str += ", __global double* time_coes, const unsigned int time_offset, __global unsigned int* time_inds) {\n";
     }
     kernel_str += "unsigned int gid = get_global_id(0);\n";
+    kernel_str += "if(gid >= ";
+    kernel_str += std::to_string(m_size.out_dim);
+    kernel_str += ")\n";
+    kernel_str += "return;\n";
     kernel_str += "__global double* loc_coes = coes ;\n";
     kernel_str += "loc_coes += gid * ";
     kernel_str += std::to_string(dims_const.size() + dims_time.size());
@@ -456,7 +460,6 @@ void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<do
     if(in.size() != m_size.in_dim && out.size() != m_size.out_dim)
         throw std::runtime_error("Polynomial Operator: vectors size does not agree with operator dimensions");
 
-    size_t num = out.size();
     cl_int err = 0;
     cl_event run_event;
 
@@ -471,8 +474,8 @@ void PolynomialOperator::apply(const CLDataStorage<double> &in, CLDataStorage<do
         throw std::runtime_error("PolynomialOperator_run : OpenCL: couldn't set an argument for the operator kernel");
     }
 
-    err = clEnqueueNDRangeKernel(m_context->command_queue(), m_kernel_oper, 1, nullptr, &num,
-             nullptr, 0, nullptr, &run_event);
+    err = clEnqueueNDRangeKernel(m_context->command_queue(), m_kernel_oper, 1, nullptr, &m_global_work_size,
+             &m_local_work_size, 0, nullptr, &run_event);
 
     if(err < 0) {
         throw std::runtime_error("PolynomialOperator_run : OpenCL: problems with kernels");

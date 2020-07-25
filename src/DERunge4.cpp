@@ -43,7 +43,9 @@ void DERunge4::SetInitState(const std::vector<double> & in)
 {
     if(in.size() != m_operator->dimension().in_dim)
         throw std::invalid_argument("Dimension of input vector should agree with operator");
-    m_init = in;
+    auto tmp = in;
+    tmp[0] = 1.0;
+    m_init = tmp;
 }
 
 void DERunge4::SetOutputs(const std::list<IDEOutput *> & in)

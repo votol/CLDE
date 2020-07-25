@@ -155,6 +155,50 @@ std::ostream& clde::operator<<(std::ostream& os, const Monomial& mo)
     return os;
 }
 
+std::ostream& clde::operator<<(std::ostream& os, const MonomialC& mo)
+{
+    os << "coefficient: ";
+    if(mo.coe.real() != 0.0)
+    {
+        os << mo.coe.real();
+        if(mo.coe.imag() != 0.0)
+        {
+            if(mo.coe.imag() > 0.0)
+                os << " + ";
+            os << mo.coe.imag();
+            os << "i";
+        }
+    }
+    else
+    {
+        if(mo.coe.imag() != 0.0)
+        {
+            os << mo.coe.imag();
+            os << "i";
+        }
+        else
+            os << "0.0";
+    }
+    os << " output: " <<mo.outInd;
+    os << " inds: ";
+    for(auto it = mo.inInds.begin(); it != mo.inInds.end(); ++it)
+    {
+        os << *it;
+        if( it != --mo.inInds.end())
+            os << ", ";
+    }
+    os << " indsc: ";
+    for(auto it = mo.inIndsC.begin(); it != mo.inIndsC.end(); ++it)
+    {
+        os << *it;
+        if( it != --mo.inIndsC.end())
+            os << ", ";
+    }
+
+    os << "; ";
+    return os;
+}
+
 std::ofstream& clde::operator<<(std::ofstream& os, const Polynomial& poly)
 {
     unsigned int out_int;
@@ -210,6 +254,24 @@ std::ifstream& clde::operator>>(std::ifstream& is, Polynomial& poly)
     }
 
     return is;
+}
+
+void clde::unitePoly(PolynomialC& dest, PolynomialC&& source, const std::complex<double>& coe)
+{
+    for(auto&& mon: source)
+    {
+        mon.coe *= coe;
+    }
+    dest.splice(dest.end(), source);
+}
+
+void clde::unitePoly(Polynomial& dest, Polynomial&& source, const double& coe)
+{
+    for(auto&& mon: source)
+    {
+        mon.coe *= coe;
+    }
+    dest.splice(dest.end(), source);
 }
 
 Polynomial clde::convertMonomials(const PolynomialC& in)
