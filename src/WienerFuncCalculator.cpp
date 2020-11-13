@@ -73,5 +73,6 @@ const unsigned int& WienerFuncCalculator::process(const double& in_t)
     clReleaseEvent(run_event);
 
     m_random_shift = (m_random_shift + 32) % 97;
+    m_current_time = in_t;
     return m_ind;
 }

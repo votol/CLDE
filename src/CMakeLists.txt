@@ -11,23 +11,9 @@ set (SOURCES CLmanagerBase.cpp
              FakeFuncCalculator.cpp
              WienerFuncCalculator.cpp
              PolynomialOutput.cpp
-             PolynomialUtils.cpp)
+             PolynomialUtils.cpp
+             DEEuler.cpp)
 
-set (HEADERS ../include/CLBLAS.h
-             ../include/CLDataStorage.h
-             ../include/CLmanager.h
-             ../include/CLmanagerBase.h
-             ../include/ICLmanager.h
-             ../include/IDEOperator.h
-             ../include/IDEOutput.h
-             ../include/DERunge4.h
-             ../include/PolynomialOperator.h
-             ../include/IFuncCalculator.h
-             ../include/FakeFuncCalculator.h
-             ../include/WienerFuncCalculator.h
-             ../include/PolynomialOutput.h
-             ../include/PolynomialUtils.h
-             )
 set (KERNELS kernels/Daxpy.cl
              kernels/WienerCalc.cl)
 
@@ -43,12 +29,11 @@ endforeach()
 
 find_package(OpenCL REQUIRED)
 
-include_directories (../include)
 include_directories (~/include)
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES}
-                                   ${HEADERS}
                                    ${KERNEL_HEADERS})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_link_libraries(${PROJECT_NAME} OpenCL::OpenCL)

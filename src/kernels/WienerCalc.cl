@@ -14,6 +14,6 @@ __kernel void wienerCalc(__global double* out, __global double* random, const un
     {
         double u1 = tmp[loc_id - loc_id%2] - 0.25*convert_double(loc_id%2);
         double u2 = tmp[loc_id - loc_id%2 + 1];
-        out[id] = sqrt(-2.0 * time *  log(u2)) * cos(2.0 * 3.14159265358979323846 * u1);
+        out[id] = sqrt(-2.0 * log(u2)/time) * cos(2.0 * 3.14159265358979323846 * u1);
     }
 }
